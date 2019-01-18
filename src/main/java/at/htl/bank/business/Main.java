@@ -4,7 +4,8 @@ import at.htl.bank.model.BankKonto;
 import at.htl.bank.model.GiroKonto;
 import at.htl.bank.model.SparKonto;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -22,6 +23,8 @@ public class Main {
   static final String KONTENDATEI = "erstellung.csv";
   static final String BUCHUNGSDATEI = "buchungen.csv";
   static final String ERGEBNISDATEI = "ergebnis.csv";
+
+  static List<BankKonto> konten = new ArrayList<>();
 
   
   /**
@@ -45,8 +48,31 @@ public class Main {
    * @param datei KONTENDATEI
    */
   private static void erstelleKonten(String datei) {
+    String firstLine;
+    String kontotyp;
+    String name;
+    double anfangsbetrag;
 
-        System.out.println("erstelleKonten noch nicht implementiert");
+    try(Scanner scanner = new Scanner(new FileReader(datei))){
+      firstLine = scanner.nextLine();
+      while (scanner.hasNextLine()){
+        String [] elements = scanner.nextLine().split(";");
+
+        kontotyp =elements[0];
+        name = elements[1];
+        anfangsbetrag = Integer.parseInt(elements[2]);
+
+        if (kontotyp.equals("Sparkonto")){
+          konten.add(new SparKonto(name,anfangsbetrag,ZINSSATZ));
+        }else if(kontotyp.equals("Girokonto")){
+          konten.add(new GiroKonto(name,anfangsbetrag,GEBUEHR));
+        }
+      }
+    }catch (FileNotFoundException e){
+      System.err.println(e.getMessage());
+    }
+
+        System.out.println("Erstellung der Konten beendet");
   }
 
   /**
@@ -64,7 +90,31 @@ public class Main {
    * @param datei BUCHUNGSDATEI
    */
   private static void fuehreBuchungenDurch(String datei) {
-        System.out.println("fuehreBuchungenDurch noch nicht implementiert");
+    String kontoVon;
+    String kontoNach;
+    String firstLine;
+    double betrag;
+
+
+    try(Scanner scanner = new Scanner(new FileReader(datei))) {
+      firstLine = scanner.nextLine();
+
+      while (scanner.hasNextLine()){
+        String elements [] = scanner.nextLine().split(";");
+        kontoVon = elements[0];
+        kontoNach = elements[1];
+        betrag = Integer.parseInt(elements[2]);
+
+
+
+      }
+
+
+    }catch (FileNotFoundException e){
+      System.err.println(e.getMessage());
+    }
+
+        System.out.println("Buchung der Beträge beendet");
   }
 
   /**
@@ -100,6 +150,12 @@ public class Main {
    *         nicht gefunden wird
    */
   public static BankKonto findeKontoPerName(String name) {
+
+    for (BankKonto konto :konten){
+      if (konto.getName().equals(name)){
+        return konto;
+      }
+    }
        return null;
   }
 
